@@ -3,7 +3,7 @@ import pandas as pd
 from ssb_libtest8 import functions
 
 
-def test_a_in_b():
+def test_a_in_b() -> None:
     df_a = pd.DataFrame(
         {
             "col_a": [1, 2, 3],
