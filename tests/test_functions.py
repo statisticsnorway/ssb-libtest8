@@ -1,6 +1,23 @@
-from ssb_libtest8.functions import example_function
+import pandas as pd
+
+from ssb_libtest8 import functions
 
 
-def test_example_function() -> None:
-    assert example_function(1, 2) == "1 is less than 2"
-    assert example_function(1, 0) == "1 is greater than or equal to 0"
+def test_a_in_b() -> None:
+    df_a = pd.DataFrame(
+        {
+            "col_a": [1, 2, 3],
+        }
+    )
+    df_b = pd.DataFrame(
+        {
+            "col_b": [2, 3, 4],
+        }
+    )
+    only_a, overlap, only_b = functions.a_in_b(df_a, df_b, "col_a", "col_b")
+    assert isinstance(only_a, pd.DataFrame)
+    assert isinstance(only_b, pd.DataFrame)
+    assert isinstance(overlap, pd.DataFrame)
+    assert len(only_a) == 1
+    assert len(only_b) == 1
+    assert len(overlap) == 2

@@ -5,31 +5,35 @@ https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 
 """
 
+import pandas as pd
 
-def example_function(number1: int, number2: int) -> str:
-    """Compare two integers.
 
-    This is merely an example function can be deleted. It is used to show and test generating
-    documentation from code, type hinting, testing, and testing examples
-    in the code.
-
+def a_in_b(
+    df_a: pd.DataFrame, df_b: pd.DataFrame, col_a: str, col_b: str = ""
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Finds overlap between two columns in two datasets, returns three dataframes, only in a, overlap and only in b.
 
     Args:
-        number1: The first number.
-        number2: The second number, which will be compared to number1.
+        df_a (pd.DataFrame): The left dataset
+        df_b (pd.DataFrame): The right dataset
+        col_a (str): The left column name
+        col_b (str): The right column name (replaced by the value of col_a, if empty)
 
     Returns:
-        A string describing which number is the greatest.
+        pd.DataFrame: The data of A, where the values are not in the column in b.
+        pd.DataFrame: The merged data of A and B, where there is a overlap in the columns.
+        pd.DataFrame: The data of B, where the values are not in the column in a.
 
     Examples:
-        Examples should be written in doctest format, and should illustrate how
-        to use the function.
-
-        >>> example_function(1, 2)
-        1 is less than 2
-
+        only_a, overlap, only_b = a_in_b(df_a, df_b, "snr_nudb")
     """
-    if number1 < number2:
-        return f"{number1} is less than {number2}"
-
-    return f"{number1} is greater than or equal to {number2}"
+    if not col_b:
+        col_b = col_a
+    only_a = df_a[~df_a[col_a].isin(df_b[col_b].unique())]
+    only_b = df_b[~df_b[col_b].isin(df_a[col_a].unique())]
+    overlap_a = df_a[df_a[col_a].isin(df_b[col_b].unique())]
+    overlap_b = df_b[df_b[col_b].isin(df_a[col_a].unique())]
+    merged_overlap = overlap_a.merge(
+        overlap_b, left_on=col_a, right_on=col_b, how="left"
+    )
+    return only_a, merged_overlap, only_b
